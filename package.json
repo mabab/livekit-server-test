@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "token": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "type": "module",
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "livekit-server-sdk": "^2.1.2"
+    "livekit-server-sdk": "^2.7.1"
   },
   "volta": {
     "node": "20.12.2"

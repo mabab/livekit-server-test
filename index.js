@@ -1,20 +1,38 @@
-import { RoomServiceClient } from "livekit-server-sdk";
+import { RoomServiceClient, AccessToken } from "livekit-server-sdk";
 
-const roomList = async () => {
-  const svc = new RoomServiceClient(
-    "http://127.0.0.1:7880",
-    "devkey",
-    "secret"
-  );
+const { LIVEKIT_URL: url, LIVEKIT_API_KEY: apiKey, LIVEKIT_API_SECRET: apiSecret } = process.env;
 
-  const opts = {
-    name: "myroom",
-    emptyTimeout: 10 * 60, // 10 minutes
+console.log(url, apiKey, apiSecret);
+
+const roomName = "tet-room-" + generateRandomString();
+const identity = "test-user-" + generateRandomString();
+
+const createRoom = async () => {
+  const svc = new RoomServiceClient(url, apiKey, apiSecret);
+
+  return svc.createRoom({
+    name: roomName,
+    emptyTimeout: 100 * 60,
     maxParticipants: 20,
-  };
-  return svc.createRoom(opts);
+  });
 };
 
-roomList().then((res) => {
-    console.log(res);
+function generateRandomString() {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < 8; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+
+
+createRoom().then(async (res) => {
+  const at = new AccessToken(apiKey, apiSecret, {
+    identity,
+  });
+  at.addGrant({ roomJoin: true, room: roomName });
+
+  console.log(await at.toJwt());
 });
